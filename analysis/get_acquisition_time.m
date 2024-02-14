@@ -6,7 +6,8 @@
 % Inputs (acquisition parameters)
 %   nchs  = number of mux channels to use
 %   nfreqs = number of freqs to acquire
-%   nskips = number of ii skip patterns (per channel)
+%   nskips = number of ii skip patterns (per channel), set to 0 for exhaustive
+%           non-reciprocal pairs (i.e., n(n-1)/2 pairs)
 %   navgs = number of datasets/averages to acquire
 %   nsamps = number of samples in the FFT
 %--------------------------------------------------------------------------
@@ -18,7 +19,7 @@
 function [total_t, daq_t, ndsets] = get_acquisition_time(nchs,nfreqs,nskips,navgs,nsamps)
 %--------------------------------------------------------------------------
 % Define clock periods
-sysclk = 10e-6;         % 100 MHz system clock period
+sysclk = 10e-9;         % 100 MHz system clock period
 uart_clk = 1/256000;    % 256k baud rate
 pga_clk = 1/(1e6);      % pga clock period
 aclk = 70e-9;           % adc clock period
@@ -46,8 +47,7 @@ nspi_bits = 16;         % width of serial data packet
 pga_set_t = nspi_bits*pga_clk + pga_dly;    % time to set PGA
 %--------------------------------------------------------------------------
 % MUX timing parameters
-% mux_dly = 1e-3;       % mux settling time
-mux_dly = 1e-6;         % mux ton max = 450ns, toff max = 435 ns
+mux_dly = 1e-6;         % mux settling time: ton max = 450ns, toff max = 435 ns
 set_iivv_t = 8*uart_cmd_t + mux_dly;    % time to set all 4 sets of muxes
 set_vv_t = 4*uart_cmd_t + mux_dly;      % time to switch vpickup muxes
 
@@ -63,7 +63,11 @@ set_vv_t = 4*uart_cmd_t + mux_dly;      % time to switch vpickup muxes
 % -- Repeat 1-5 x n_iis x n_vvs
 %--------------------------------------------------------------------------
 % Compute total acquisition time
-n_iis = nchs*nskips;    % total number of ii pairs
+if nskips == 0
+    n_iis = nchs*(nchs-1)/2;% total number of exhaustive, non-reciprocal ii pairs
+else
+    n_iis = nchs*nskips;    % total number of ii pairs (using skip patterns)
+end
 n_vvs = round(nchs/2);  % total number of vpickup measurements per ii pair
 ndsets = n_iis*n_vvs*nfreqs*navgs;  % total number of datasets to acquire
 %--------------------------------------------------------------------------
