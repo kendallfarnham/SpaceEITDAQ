@@ -28,7 +28,7 @@ aclk = 70e-9;           % adc clock period
 % nfft = 1024;                  % number of samples collected
 adc_samp_t = nsamps * aclk;     % adc sampling time (fifo write)
 fft_read_t = nsamps * sysclk;   % time to read fifo to fft block
-fft_comp_t = 2.56e-6;           % fft computation time (approx 2.56 us)
+fft_comp_t = 112 * sysclk;      % fft computation time (112 clock cycles)
 demod_comp_t = nsamps * sysclk; % time to read fft spectrum data
 dds_dly_t = nsamps * sysclk;    % internal delay time after switching freqs
 daq_t = adc_samp_t + fft_read_t + fft_comp_t + demod_comp_t; % acquisition time
@@ -47,9 +47,9 @@ nspi_bits = 16;         % width of serial data packet
 pga_set_t = nspi_bits*pga_clk + pga_dly;    % time to set PGA
 %--------------------------------------------------------------------------
 % MUX timing parameters
-mux_dly = 1e-6;         % mux settling time: ton max = 450ns, toff max = 435 ns
-set_iivv_t = 8*uart_cmd_t + mux_dly;    % time to set all 4 sets of muxes
-set_vv_t = 4*uart_cmd_t + mux_dly;      % time to switch vpickup muxes
+mux_dly = 50e-6;         % mux settling time: ton max = 450ns, toff max = 435 ns
+set_iivv_t = 10*uart_cmd_t + mux_dly;    % time to set all 4 sets of muxes
+set_vv_t = 6*uart_cmd_t + mux_dly;      % time to switch vpickup muxes
 
 %--------------------------------------------------------------------------
 % Acquisition Steps
