@@ -3,7 +3,7 @@
 %--------------------------------------------------------------------------
 close all
 clear all
-% addpath ../mfiles
+addpath ../mfiles % path to extraction functions
 
 %--------------------------------------------------------------------------
 % Plots
@@ -55,6 +55,11 @@ RLs = [10,50,100,200,300,500,1e3,2e3,3e3,5e3,10e3]';
 % extract_plot_variables(folder_data,workspace_path,board_num,
 %       avg_datasets,rm_outliers,kp_inds,prange)
 workspace_path = [dpath extractBefore(wkspc_fname,'.') '_pltvars.mat'];
+if dataset_type == 1
+    board_num = 2;
+else
+    board_num = 3;
+end
 if reextract_plot_variables
     if dataset_type == 1
         load([dpath wkspc_fname],'folder_data','RLs')
@@ -67,7 +72,6 @@ if reextract_plot_variables
         [RLs,sorti] = sort(RLs);
         folder_data = folder_data(sorti);
 
-        board_num = 2;
         avg_datasets = 1;
         rm_outliers = 0;
         % main_gui_extract_plot_variables(folder_data,workspace_path,board_num,avg_datasets)
@@ -75,11 +79,9 @@ if reextract_plot_variables
             avg_datasets,rm_outliers)
     elseif dataset_type == 3
         load([dpath wkspc_fname],'eit_data_struct')
-        board_num = 3;
         main_gui_combine_plot_variables(eit_data_struct,workspace_path,board_num)
     else
         load([dpath wkspc_fname],'eit_data_struct','plt_var_struct')
-        board_num = 3;
         if ~exist('plt_var_struct','var')
             main_gui_combine_plot_variables(eit_data_struct,workspace_path,board_num)
         else
@@ -99,11 +101,6 @@ end
 %--------------------------------------------------------------------------
 % Plots
 %--------------------------------------------------------------------------
-pcolors = get_colors(length(RLs)); % plot line colors
-for k = 1:length(pcolors)
-    pcolor_order(k,:) = pcolors{k};
-end
-% colororder(pcolor_order)            % set plotting color order
 colororder("gem12")
 %--------------------------------------------------------------------------
 precision_ylims = [0 3];
@@ -778,7 +775,7 @@ if plot_mean_std
             % Plot
             nexttile; hold on
             for iii = 1:size(inBetween,1)
-                fill(x2,inBetween(iii,:),ones(size(inBetween(iii,:))),'FaceColor',pcolors{iii},'FaceAlpha',0.8);
+                fill(x2,inBetween(iii,:),ones(size(inBetween(iii,:))),'FaceAlpha',0.8);
                 % semilogx(x,ymean(iii,:),'Color',pcolors{iii},'LineStyle',':');
             end
             title([var1{i} ' ' var3{ii}]); grid on
@@ -815,7 +812,7 @@ if plot_mean_std
             semilogx(x,ones(size(x)),'k--'); % Dashed line at y = 1
             Carray = ones(size(inBetween(iii,:)));
             for iii = 1:size(inBetween,1)
-                fill(x2,inBetween(nfiles+1-iii,:),Carray,'FaceColor',pcolors{iii},'FaceAlpha',0.5);
+                fill(x2,inBetween(nfiles+1-iii,:),Carray,'FaceAlpha',0.5);
             end
             ylim([1-0.002 1+0.002])
             title([var1{i} ' ' var3{ii}])
