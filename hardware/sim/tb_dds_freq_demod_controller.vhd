@@ -67,7 +67,7 @@ signal phase_lut_dout, freqA, freqB : STD_LOGIC_VECTOR (PHASE_WIDTH-1 downto 0) 
 signal fft_bin_lut_data : std_logic_vector(FFT_LUT_BIN_WIDTH-1 downto 0) := (others => '0');
 
 -- Signals for testbench logic
-signal testnum : integer := 0;
+signal testnum, sAmplitude, sOffset : integer := 0;
 signal enable, reset, set_dual : std_logic := '0';
 
 ----------------------------------------------------------------------------------
@@ -120,7 +120,6 @@ end component;
 COMPONENT blk_mem_gen_0
   PORT (
     clka : IN STD_LOGIC;
-    ena : IN STD_LOGIC;
     addra : IN STD_LOGIC_VECTOR(PHASE_LUT_ADDR_WIDTH-1 DOWNTO 0);
     douta : OUT STD_LOGIC_VECTOR(PHASE_WIDTH-1 DOWNTO 0) 
   );
@@ -130,7 +129,6 @@ END COMPONENT;
 COMPONENT blk_mem_gen_2
   PORT (
     clka : IN STD_LOGIC;
-    ena : IN STD_LOGIC;
     addra : IN STD_LOGIC_VECTOR(PHASE_LUT_ADDR_WIDTH-1 DOWNTO 0);
     douta : OUT STD_LOGIC_VECTOR(FFT_LUT_BIN_WIDTH-1 DOWNTO 0) 
   );
@@ -170,7 +168,6 @@ dds_inst : dualtone_dds_controller port map (
 phase_lut_inst : blk_mem_gen_0
 port map (
     clka => sysclk,
-    ena => '1',                 -- always enabled
     addra => phase_lut_addr,
     douta => phase_lut_dout);
 ----------------------------------------------------------------------------------
@@ -178,7 +175,6 @@ port map (
 fft_bin_lut_inst : blk_mem_gen_2
 port map (
     clka => sysclk,
-    ena => '1',                 -- always enabled
     addra => phase_lut_addr,
     douta => fft_bin_lut_data);    
 ----------------------------------------------------------------------------------
@@ -200,11 +196,17 @@ begin
     end if;
 end process;
 ----------------------------------------------------------------------------------
+set_adin : process(sAmplitude, sOffset, dds_out)
+begin
+
+adin <= std_logic_vector(to_signed(sAmplitude*to_integer(signed(dds_out))+sOffset,ADC_DATA_WIDTH)); -- add dc offset
+end process;
+----------------------------------------------------------------------------------
 -- Connect ports
 ----------------------------------------------------------------------------------
 --adin <= std_logic_vector(resize(signed(dds_out), ADC_DATA_WIDTH));  -- DDS to ADC input
 --adin <= dds_out & "00";
-adin <= std_logic_vector(to_signed(to_integer(signed(dds_out))+350,ADC_DATA_WIDTH)); -- add dc offset
+--adin <= std_logic_vector(to_signed(to_integer(signed(dds_out))+350,ADC_DATA_WIDTH)); -- add dc offset
 adin_sync_start <= dds_out_last;
 enable_demod <= enable;
 enable_dds <= enable;
@@ -259,6 +261,8 @@ begin
     set_dual <= '0';
     use_slow_fs <= '0';
     n_averages <= 3;
+    sAmplitude <= 1;
+    sOffset <= 350;
     wait for SIM_WAIT_TIME;
     
     enable <= '1';
@@ -284,7 +288,8 @@ begin
     reset <= '1';
     wait for CLOCK_PERIOD;
     reset <= '0';
-    
+    sAmplitude <= 2;
+    sOffset <= 0;
     
     -- Use single tone DDS
     phase_lut_addr <= std_logic_vector(to_unsigned(34,PHASE_LUT_ADDR_WIDTH));
