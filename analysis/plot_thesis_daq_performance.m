@@ -1,9 +1,9 @@
 %--------------------------------------------------------------------------
 % Plot DAQ performance - thesis figures
 %--------------------------------------------------------------------------
-% close all
+close all
 clear all
-addpath ../mfiles
+% addpath ../mfiles
 
 %--------------------------------------------------------------------------
 % Plots
@@ -73,16 +73,17 @@ if reextract_plot_variables
         % main_gui_extract_plot_variables(folder_data,workspace_path,board_num,avg_datasets)
         extract_plot_variables(folder_data,workspace_path,board_num, ...
             avg_datasets,rm_outliers)
+    elseif dataset_type == 3
+        load([dpath wkspc_fname],'eit_data_struct')
+        board_num = 3;
+        main_gui_combine_plot_variables(eit_data_struct,workspace_path,board_num)
     else
         load([dpath wkspc_fname],'eit_data_struct','plt_var_struct')
         board_num = 3;
-        if ~exist('plt_var_struct','var') && dataset_type == 2
-            dataset_type = 3
-        end
-        if dataset_type == 2
-            main_gui_extract_plot_variables(plt_var_struct,workspace_path,board_num,0)
-        elseif dataset_type == 3
+        if ~exist('plt_var_struct','var')
             main_gui_combine_plot_variables(eit_data_struct,workspace_path,board_num)
+        else
+            main_gui_extract_plot_variables(plt_var_struct,workspace_path,board_num,0);
         end
     end
     load(workspace_path)
