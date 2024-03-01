@@ -7,6 +7,8 @@
 %       Fdc (FFT data for bin 0, real only)
 %       nAdc (1: isense, 2: vpickup1, 3: vpickup2)
 %       Gpga (PGA gain, optional -- default 1)
+% Optional inputs:
+%       board_num (AFE board number for loading RC values)
 % Outputs: Vpp (peak-to-peak amplitude)
 %       Vrms (RMS amplitude)
 %       Vdc (DC offset)
@@ -26,21 +28,22 @@ Giamp = afe_params.Giamp;       % I-amp gain
 Gdriver = afe_params.Gdriver;   % Gain on ADC driver
 Gvpu = afe_params.Gvpu;         % Gain on voltage pickup op amp
 ADC_FSV = afe_params.ADC_FSV;   % fullscale amplitude
-sf = afe_params.sf;     % Scaling factor = 2^B - 1 (full range of ADC, B=16) 
+sf = afe_params.sf;             % Scaling factor = 2^B - 1 (full range of ADC, B=16) 
+fft_sc = afe_params.fft_sc;     % FFT scaling factor = 4
 
 if ~exist('Gpga','var')
-    Gpga = 1;       % set default pga gain to +1
+    Gpga = 1;                   % set default pga gain to +1
 end
 
 %--------------------------------------------------------------------------
 % Calculate Circuit gains
 if nAdc == 1
-    Gckt = Giamp*Gdriver*Gpga;     % isense circuit
+    Gckt = Giamp*Gdriver*Gpga;  % isense circuit
 else
-    Gckt = Gvpu*Gdriver*Gpga;      % voltage pickup circuit
+    Gckt = Gvpu*Gdriver*Gpga;   % voltage pickup circuit
 end
 
-Gckt = Gckt/4;      % FFT transform factor
+Gckt = Gckt/fft_sc;             % FFT scaling factor
 
 %--------------------------------------------------------------------------
 % Calculate Voltages

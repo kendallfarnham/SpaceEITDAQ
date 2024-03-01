@@ -1,12 +1,13 @@
 %--------------------------------------------------------------------------
 % User Interface Functions: 64-Channel DAQ Rev 2
 %--------------------------------------------------------------------------
-% Calculate voltages from fft data
+% Calibrate Rload 
 %--------------------------------------------------------------------------
 % Inputs: Rload (Vload/Isense data)
 %       freqs (freqs)
-%       no_mux (T/F)
-%       brd_num (board used for acquisition
+%       brd_num (AFE board used for acquisition)
+%       no_mux (T/F mux board used for acquisition)
+%       plot_results (T/F show plots)
 % Outputs: Rload_cal (calibrated measured load)
 %       Vload_cal (calibrated voltage across load, peak-to-peak amplitude)
 %       Iload_cal (calibrated current across load)

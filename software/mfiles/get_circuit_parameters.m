@@ -53,6 +53,10 @@ afe_params.ADC_FSV = 4.096;    % fullscale amplitude
 afe_params.sf = 2^B - 1;       % Scaling factor = 2^B - 1 (full range of ADC) 
 
 %--------------------------------------------------------------------------
+% Hardware parameters
+afe_params.fft_sc = 4;         % FFT scaling factor
+
+%--------------------------------------------------------------------------
 % EIT calibration factors for measured Rload
 %--------------------------------------------------------------------------
 % Given Rload = Vload/Isense, inverted cal factor 1/cf = 1.765-0.0005638*Rload

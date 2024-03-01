@@ -10,6 +10,7 @@
 %       Gpgas (PGA gains for Isense, V1, V2 ADCs)
 %       freqs (freqs)
 %       no_mux (T/F)
+%       board_num (AFE board used for acquisition)
 % Outputs: Vload_cal (calibrated voltage across load, peak-to-peak amplitude)
 %       Iload_cal (calibrated current across load)
 %--------------------------------------------------------------------------
@@ -92,18 +93,18 @@ end
     
 for n = 1:size(Vload,2)
 
-    %--------------------------------------------------------------------------
-    % Calculate load on Vsource, Zload = Rload+Zvpu || Zvpu
-    Zload(:,n) = real(1./(1./(Rload(:,n)+Zvpu(n))+ 1./Zvpu(n)));
+%--------------------------------------------------------------------------
+% Calculate load on Vsource, Zload = Rload+Zvpu || Zvpu
+Zload(:,n) = real(1./(1./(Rload(:,n)+Zvpu(n))+ 1./Zvpu(n)));
 
-    %--------------------------------------------------------------------------
-    % Calculate actual voltage and current coming out of Vsource
-    Iload_cal(:,n) = Isense(:,n).*real(Zvpu(n)./(2*Zvpu(n)+Rload(:,n)));
-    Rload_cal(:,n) = Vload(:,n)./Iload_cal(:,n);
+%--------------------------------------------------------------------------
+% Calculate actual voltage and current coming out of Vsource
+Iload_cal(:,n) = Isense(:,n).*real(Zvpu(n)./(2*Zvpu(n)+Rload(:,n)));
+Rload_cal(:,n) = Vload(:,n)./Iload_cal(:,n);
 
-    %--------------------------------------------------------------------------
-    % Calculate actual voltage and current coming out of Vsource
-    Vload_cal(:,n) = Isense(:,n) .* real(Zload(:,n));
+%--------------------------------------------------------------------------
+% Calculate actual voltage and current coming out of Vsource
+Vload_cal(:,n) = Isense(:,n) .* real(Zload(:,n));
 
 
 end

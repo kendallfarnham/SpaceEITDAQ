@@ -83,81 +83,81 @@ end
 % Get calibration factor per frequency
 cf = 1./cf;                 % Invert for linear regression
 Rload_cal = cf.*Rload;      % calibrated load using freq sweep cal factor
-    %--------------------------------------------------------------------------
-    % Generate linear regression line for midpoint freq
-    mdpt = 30; %round(size(Rl_calc,2));
-    x_regression = linspace(min(Rl_calc(:)), max(Rl_calc(:)), 100); % 100 points for a smooth line
-    y_regression = polyval([slopes(mdpt) intercepts(mdpt)], x_regression);
+%--------------------------------------------------------------------------
+% Generate linear regression line for midpoint freq
+mdpt = 30; %round(size(Rl_calc,2));
+x_regression = linspace(min(Rl_calc(:)), max(Rl_calc(:)), 100); % 100 points for a smooth line
+y_regression = polyval([slopes(mdpt) intercepts(mdpt)], x_regression);
 Rload_cal_single = cf(:,mdpt).*Rload;
 
 if exist('plot_results','var') && plot_results
-    %--------------------------------------------------------------------------
-    % Set up plot parameters
-    %--------------------------------------------------------------------------
-    figure;
-    colororder("gem12");
-    C = colororder;
-    if size(C,1) > size(Rload,1)
-        newcolors = C(1:size(Rload,1),:);
-        colororder(newcolors)
-    end
-    RLs = afe_params.RLs;           % get rloads on resistor board
-    Rl_actual = repmat(RLs,[1 length(freqs)]);
-    %--------------------------------------------------------------------------
-    % Plot calculated Rload vs calibrated
-    %--------------------------------------------------------------------------
-    t = tiledlayout('horizontal','TileSpacing','tight','Padding','tight');
-    nexttile
-    loglog(freqs,Rload); grid on; title('Rload = Vload \div Isense')
-    hold on; loglog(freqs,Rl_actual,'--'); ylabel('Resistance (\Omega)')
-    nexttile
-    loglog(freqs,Rload_cal); grid on; title('Adjusted Rload (CF per Frequency)')
-    hold on; loglog(freqs,Rl_actual,'--')
-
-    nexttile
-    loglog(freqs,Rload_cal_single); grid on; title('Adjusted Rload (CF at 19.7 kHz)')
-    hold on; loglog(freqs,Rl_actual,'--')
-
-    lgd = legend(cellstr(num2str(RLs)),'Location','northeastoutside'); title(lgd,'RLoad (\Omega)')
-    title(t,'Calibrating Measured Load Resistance (Rload = Vload/Isense)')
-    xlabel(t,'Frequency (Hz)')
-    %--------------------------------------------------------------------------
-    % Plot ratio for determining Calibration Factor
-    %--------------------------------------------------------------------------
-    figure;
+%--------------------------------------------------------------------------
+% Set up plot parameters
+%--------------------------------------------------------------------------
+figure;
+colororder("gem12");
+C = colororder;
+if size(C,1) > size(Rload,1)
+    newcolors = C(1:size(Rload,1),:);
     colororder(newcolors)
-    t = tiledlayout('flow','TileSpacing','compact','Padding','compact');
-    %--------------------------------------------------------------------------
-    % plot all frequencies
-    nexttile
-    plot(Rl_calc,Rl_calc./RLs); grid on
-    title(sprintf('Frequencies %.f Hz to %.1f MHz',freqs(1),freqs(end)/1e6));
-    xlabel('Rload = Vload/Isense'), ylabel('Rload/R(Actual)');
+end
+RLs = afe_params.RLs;           % get rloads on resistor board
+Rl_actual = repmat(RLs,[1 length(freqs)]);
+%--------------------------------------------------------------------------
+% Plot calculated Rload vs calibrated
+%--------------------------------------------------------------------------
+t = tiledlayout('horizontal','TileSpacing','tight','Padding','tight');
+nexttile
+loglog(freqs,Rload); grid on; title('Rload = Vload \div Isense')
+hold on; loglog(freqs,Rl_actual,'--'); ylabel('Resistance (\Omega)')
+nexttile
+loglog(freqs,Rload_cal); grid on; title('Adjusted Rload (CF per Frequency)')
+hold on; loglog(freqs,Rl_actual,'--')
+
+nexttile
+loglog(freqs,Rload_cal_single); grid on; title('Adjusted Rload (CF at 19.7 kHz)')
+hold on; loglog(freqs,Rl_actual,'--')
+
+lgd = legend(cellstr(num2str(RLs)),'Location','northeastoutside'); title(lgd,'RLoad (\Omega)')
+title(t,'Calibrating Measured Load Resistance (Rload = Vload/Isense)')
+xlabel(t,'Frequency (Hz)')
+%--------------------------------------------------------------------------
+% Plot ratio for determining Calibration Factor
+%--------------------------------------------------------------------------
+figure;
+colororder(newcolors)
+t = tiledlayout('flow','TileSpacing','compact','Padding','compact');
+%--------------------------------------------------------------------------
+% plot all frequencies
+nexttile
+plot(Rl_calc,Rl_calc./RLs); grid on
+title(sprintf('Frequencies %.f Hz to %.1f MHz',freqs(1),freqs(end)/1e6));
+xlabel('Rload = Vload/Isense'), ylabel('Rload/R(Actual)');
 
 
-    %--------------------------------------------------------------------------
-    % plot it
-    nexttile
-    plot(Rl_calc(:,mdpt),Rl_calc(:,mdpt)./RLs,'DisplayName','19.7 kHz data');  grid on; hold on
-    plot(x_regression,y_regression,'k--','DisplayName','Linear Regression'); % Plot regression line
-    legend('Location','northeast')
-    % Add the equation text
-    equationText = sprintf('y = %.5fx + %.5f', slopes(mdpt), intercepts(mdpt));
-    textLocation = [0.5*mean(Rl_calc(:,mdpt)), 0.5*mean(Rl_calc(:,mdpt)./RLs)]; % Adjust these values as needed for best appearance
-    text(textLocation(1), textLocation(2), equationText, 'FontSize', 11);
-    title(sprintf('Calibration Frequency %.1f kHz',freqs(mdpt)/1e3));
-    xlabel('Rload = Vload/Isense'), ylabel('Rload/R(Actual)');
+%--------------------------------------------------------------------------
+% plot it
+nexttile
+plot(Rl_calc(:,mdpt),Rl_calc(:,mdpt)./RLs,'DisplayName','19.7 kHz data');  grid on; hold on
+plot(x_regression,y_regression,'k--','DisplayName','Linear Regression'); % Plot regression line
+legend('Location','northeast')
+% Add the equation text
+equationText = sprintf('y = %.5fx + %.5f', slopes(mdpt), intercepts(mdpt));
+textLocation = [0.5*mean(Rl_calc(:,mdpt)), 0.5*mean(Rl_calc(:,mdpt)./RLs)]; % Adjust these values as needed for best appearance
+text(textLocation(1), textLocation(2), equationText, 'FontSize', 11);
+title(sprintf('Calibration Frequency %.1f kHz',freqs(mdpt)/1e3));
+xlabel('Rload = Vload/Isense'), ylabel('Rload/R(Actual)');
 
 
-    %--------------------------------------------------------------------------
-    nexttile
-    semilogx(freqs,slopes);  title('Linear Regression Slope'); grid on
-    xlabel('Frequency (Hz)')
-    nexttile
-    semilogx(freqs,intercepts);  title('Linear Regression Intercepts'); grid on
-    xlabel('Frequency (Hz)')
-    % nexttile
-    % loglog(freqs,Rload_cal); grid on; title('Adjusted Rload ')
-    % hold on; loglog(freqs,Rl_actual,'--')
-    title(t,'Calibration Factor for Adjusting Measured Rload');
+%--------------------------------------------------------------------------
+nexttile
+semilogx(freqs,slopes);  title('Linear Regression Slope'); grid on
+xlabel('Frequency (Hz)')
+nexttile
+semilogx(freqs,intercepts);  title('Linear Regression Intercepts'); grid on
+xlabel('Frequency (Hz)')
+% nexttile
+% loglog(freqs,Rload_cal); grid on; title('Adjusted Rload ')
+% hold on; loglog(freqs,Rl_actual,'--')
+title(t,'Calibration Factor for Adjusting Measured Rload');
 end

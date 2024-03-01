@@ -9,7 +9,7 @@
 % Inputs: fk (real or complex FFT data for signal bin(s))
 %       sumf2 (sum of |FFT|^2)
 % Optional inputs:
-%       half_spectrum (sum includes half (1) or full (0) spectrum FFT data)
+%       half_spectrum (sumf2 includes half (1) or full (0) spectrum FFT data)
 % Outputs: thd (total harmonic distortion)
 %--------------------------------------------------------------------------
 function [thd] = calc_thd_from_fft(fk, sumf2, half_spectrum)
